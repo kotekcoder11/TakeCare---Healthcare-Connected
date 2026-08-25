@@ -1,0 +1,13 @@
+App Name: TakeCare
+Purpose: 
+# Where doctors and paients where connect in one platform.
+Features:
+ - Medical Prescriptions
+ - Medical Prescription Alarms
+ - Fayda verification if your doctor or paient
+ - Paient, Doctor & Admin portal
+ - AI Prescription Note Suggestion
+ - Easily accessible.
+ - Log-in 
+ - Sign Up with if you are a doctor online test verification
+ - Doctor's Appointment Attended / Late / Absent

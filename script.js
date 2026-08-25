@@ -1,0 +1,181 @@
+async function fayda_verify() {
+  const faydaAccount = document.getElementById("fayda").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (password.length < 8) {
+    alert("Password must be at least 8 characters long.");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `https://dummyjson.com/users?limit=1&skip=0&search=${encodeURIComponent(faydaAccount)}`,
+    );
+    if (!response.ok) throw new Error("Unable to verify account.");
+
+    const data = await response.json();
+    const account = data.users?.[0];
+    if (!account) throw new Error("Account not found.");
+
+    document.body.innerHTML = `<div class="app-layout">
+      <nav class="sidebar" id="app-sidebar">
+        <div class="sidebar__header">
+          <a href="#" class="sidebar__brand">
+            <img
+              src="${account.image}"
+              class="rounded mx-auto d-block"
+              alt="..."
+              width="70px"
+              style="margin-top: 10px; border-radius: 100px"
+            />
+          </a>
+        </div>
+        <ul class="sidebar__menu">
+          <li>
+            <a href="#" class="sidebar-link is-active"
+              ><svg class="sidebar-link__icon" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"
+                /></svg
+              ><span class="sidebar-link__text">Dashboard</span></a
+            >
+          </li>
+          <li>
+            <a href="#" class="sidebar-link"
+              ><i class="bi bi-capsule"></i
+              ><span class="sidebar-link__text">Prescriptions</span></a
+            >
+          </li>
+          <li>
+            <a href="#" class="sidebar-link">
+              <i class="bi bi-alarm"></i
+              ><span class="sidebar-link__text">Alarms</span></a
+            >
+          </li>
+          <li>
+            <a href="#" class="sidebar-link">
+              <i class="bi bi-calendar2-week"></i
+              ><span class="sidebar-link__text">Appointments</span></a
+            >
+          </li>
+          <li>
+            <a href="#" class="sidebar-link">
+              <img src="assets/icons/logo_only_v1.png" alt="" width="20px" />
+              <span class="sidebar-link__text">My Fayda</span></a
+            >
+          </li>
+        </ul>
+        <div class="sidebar__footer">
+          <a href="about:blank" class="sidebar-link" id="sidebar-collapse-btn">
+            <!-- The collapse (left arrow) icon -->
+            <i class="bi bi-box-arrow-left"></i>
+            <!-- The expand (right arrow) icon -->
+            <span class="sidebar-link__text">Log Out</span>
+          </a>
+        </div>
+      </nav>
+      <div class="page-content-wrapper">
+        <header class="mobile-header">
+          <button
+            id="mobile-menu-open-btn"
+            aria-label="Open menu"
+            aria-controls="app-sidebar"
+            aria-expanded="false"
+          >
+            &#x2630;
+          </button>
+          <a href="#" class="sidebar__brand"></a>
+        </header>
+        <main class="main-content" style="margin-top: 20px; margin-left: 20px">
+          <h1><strong>Welcome, ${account.firstName}👋</strong></h1>
+          <p>You’ve got 2 active prescriptions and one appointment tomorrow.</p>
+          <br />
+          <div class="dashboard-cards">
+            <div class="card">
+              <div class="card-body">
+                <h1><strong>2</strong></h1>
+                <p>Active Rx</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <h1><strong>2</strong></h1>
+                <p>Alarm</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <h1><strong>Tomorrow</strong></h1>
+                <p>Appointments</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <h1><strong>Verified</strong></h1>
+                <p>Fayda</p>
+              </div>
+            </div>
+          </div>
+          <br />
+          <h2><strong>Recent Prescriptions</strong></h2>
+          <br />
+          <div class="card">
+            <div class="card-body">
+              <h4><strong>Amoxicillin 500mg</strong></h4>
+              <p>1 capusule, 3x A day</p>
+            </div>
+          </div>
+          <br />
+          <div class="card">
+            <div class="card-body">
+              <h4><strong>Vitamin D3</strong></h4>
+              <p>Once a day</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebar = document.getElementById("app-sidebar");
+        const collapseBtn = document.getElementById("sidebar-collapse-btn");
+        const mobileOpenBtn = document.getElementById("mobile-menu-open-btn");
+        const isCollapsedKey = "sidebarIsCollapsed";
+
+        if (collapseBtn && sidebar) {
+          if (localStorage.getItem(isCollapsedKey) === "true")
+            sidebar.classList.add("is-collapsed");
+          collapseBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            sidebar.classList.toggle("is-collapsed");
+            localStorage.setItem(
+              isCollapsedKey,
+              sidebar.classList.contains("is-collapsed"),
+            );
+          });
+        }
+
+        if (mobileOpenBtn && sidebar) {
+          mobileOpenBtn.addEventListener("click", () => {
+            sidebar.classList.add("is-open");
+            mobileOpenBtn.setAttribute("aria-expanded", "true");
+            const overlay = document.createElement("div");
+            overlay.className = "sidebar-overlay";
+            document.body.appendChild(overlay);
+            overlay.addEventListener("click", closeMobileMenu);
+          });
+        }
+
+        function closeMobileMenu() {
+          sidebar.classList.remove("is-open");
+          mobileOpenBtn.setAttribute("aria-expanded", "false");
+          const overlay = document.querySelector(".sidebar-overlay");
+          if (overlay) overlay.remove();
+        }
+      });
+    </script>`;
+  } catch (error) {
+    alert(error.message);
+  }
+}

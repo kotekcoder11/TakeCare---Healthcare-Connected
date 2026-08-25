@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TakeCare - Healthcare, Connected.</title>
+    <link
+      id="theme_icon"
+      rel="icon"
+      type="image/x-icon"
+      href="assets/logo/TAKECARE_dark.jpg"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+  </head>
+  <body>
+    <br />
+    <br />
+    <br />
+    <center>
+      <img src="assets/logo/TAKECARE.jpg" alt="TakeCare Logo" width="200" />
+    </center>
+    <br />
+    <center>
+      <h1>LOG IN</h1>
+    </center>
+    <br />
+    <br />
+    <div class="input-group login-input-group mb-3">
+      <span class="input-group-text" id="basic-addon1"
+        ><img src="assets/icons/logo_only_v1.png" alt="" width="15px"
+      /></span>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Fayda ID (FIN/FAN)"
+        aria-label="Username"
+        aria-describedby="basic-addon1"
+        id="fayda"
+      />
+    </div>
+    <div style="margin-top: 20px" class="input-group login-input-group mb-3">
+      <span class="input-group-text" id="basic-addon1">
+        <i class="bi bi-lock"></i>
+      </span>
+      <input
+        id="password"
+        type="password"
+        class="form-control"
+        placeholder="Password"
+        aria-label="Username"
+        aria-describedby="basic-addon1"
+      />
+    </div>
+    <br />
+    <div class="login-actions">
+      <button
+        onclick="fayda_verify()"
+        type="button"
+        class="btn btn-outline-success"
+      >
+        Log In
+      </button>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
