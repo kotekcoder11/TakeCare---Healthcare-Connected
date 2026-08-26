@@ -1,6 +1,15 @@
+let id;
 async function fayda_verify() {
-  const faydaAccount = document.getElementById("fayda").value.trim();
-  const password = document.getElementById("password").value;
+  const faydaInput = document.getElementById("fayda");
+  const passwordInput = document.getElementById("password");
+  const faydaAccount = faydaInput.value.trim();
+  const password = passwordInput.value;
+
+  if (!faydaAccount) {
+    alert("Please enter your Fayda ID.");
+    faydaInput.focus();
+    return;
+  }
 
   if (password.length < 8) {
     alert("Password must be at least 8 characters long.");
@@ -8,13 +17,20 @@ async function fayda_verify() {
   }
 
   try {
+    const supabaseUrl = "https://abrvlqymzaqpmgfktwfr.supabase.co/rest/v1";
+    const apiKey = "sb_publishable_6YWtr3aPR8V43iInTNwnCw_jEfYrInS";
+    const accountParams = new URLSearchParams({
+      apikey: apiKey,
+      fayda_fin_fan: `eq.${faydaAccount}`,
+      password: `eq.${password}`,
+    });
     const response = await fetch(
-      `https://dummyjson.com/users?limit=1&skip=0&search=${encodeURIComponent(faydaAccount)}`,
+      `${supabaseUrl}/fayda-identy-test?${accountParams}`,
     );
     if (!response.ok) throw new Error("Unable to verify account.");
 
     const data = await response.json();
-    const account = data.users?.[0];
+    const account = Array.isArray(data) ? data[0] : data.users?.[0];
     if (!account) throw new Error("Account not found.");
 
     document.body.innerHTML = `<div class="app-layout">
@@ -22,7 +38,7 @@ async function fayda_verify() {
         <div class="sidebar__header">
           <a href="#" class="sidebar__brand">
             <img
-              src="${account.image}"
+              src="${account.img}"
               class="rounded mx-auto d-block"
               alt="..."
               width="70px"
@@ -67,7 +83,7 @@ async function fayda_verify() {
           </li>
         </ul>
         <div class="sidebar__footer">
-          <a href="about:blank" class="sidebar-link" id="sidebar-collapse-btn">
+          <a href="index.html" class="sidebar-link" id="sidebar-collapse-btn">
             <!-- The collapse (left arrow) icon -->
             <i class="bi bi-box-arrow-left"></i>
             <!-- The expand (right arrow) icon -->
@@ -88,25 +104,25 @@ async function fayda_verify() {
           <a href="#" class="sidebar__brand"></a>
         </header>
         <main class="main-content" style="margin-top: 20px; margin-left: 20px">
-          <h1><strong>Welcome, ${account.firstName}👋</strong></h1>
-          <p>You’ve got 2 active prescriptions and one appointment tomorrow.</p>
+          <h1><strong>Welcome, ${account.first_name}👋</strong></h1>
+          <p id="activeprs_appoint"></p>
           <br />
           <div class="dashboard-cards">
             <div class="card">
               <div class="card-body">
-                <h1><strong>2</strong></h1>
+                <h1><strong>${account.prescriptions}</strong></h1>
                 <p>Active Rx</p>
               </div>
             </div>
             <div class="card">
               <div class="card-body">
-                <h1><strong>2</strong></h1>
+                <h1><strong>${account.alarms}</strong></h1>
                 <p>Alarm</p>
               </div>
             </div>
             <div class="card">
               <div class="card-body">
-                <h1><strong>Tomorrow</strong></h1>
+                <h1><strong>${account.appoint_timeleft}</strong></h1>
                 <p>Appointments</p>
               </div>
             </div>
@@ -119,19 +135,7 @@ async function fayda_verify() {
           </div>
           <br />
           <h2><strong>Recent Prescriptions</strong></h2>
-          <br />
-          <div class="card">
-            <div class="card-body">
-              <h4><strong>Amoxicillin 500mg</strong></h4>
-              <p>1 capusule, 3x A day</p>
-            </div>
-          </div>
-          <br />
-          <div class="card">
-            <div class="card-body">
-              <h4><strong>Vitamin D3</strong></h4>
-              <p>Once a day</p>
-            </div>
+          <div id="prescriptions">
           </div>
         </main>
       </div>
@@ -175,6 +179,48 @@ async function fayda_verify() {
         }
       });
     </script>`;
+    const appointmentCount = Number(account.active_appointments) || 0;
+    const prescriptionCount = Number(account.prescriptions) || 0;
+    const timeleftRecentAppointment = account.appoint_timeleft || "";
+    const appoints =
+      appointmentCount === 1
+        ? `You have one appointment ${timeleftRecentAppointment}.`
+        : appointmentCount > 1
+          ? `You have ${appointmentCount} appointments ${timeleftRecentAppointment}.`
+          : "";
+    const prescription =
+      prescriptionCount === 1
+        ? "You have one prescription"
+        : prescriptionCount > 1
+          ? `You have ${prescriptionCount} prescriptions`
+          : "";
+    document.getElementById("activeprs_appoint").textContent = [
+      prescription,
+      appoints,
+    ]
+      .filter(Boolean)
+      .join(" and ");
+    const prescriptionParams = new URLSearchParams({
+      apikey: apiKey,
+      for: `eq.${account.id}`,
+    });
+    const res = await fetch(
+      `${supabaseUrl}/prescriptions?${prescriptionParams}`,
+    );
+    if (!res.ok) throw new Error("Unable to load prescriptions.");
+    const info = await res.json();
+    const prescriptions = info;
+    let phtml = "";
+    prescriptions.forEach((presc) => {
+      phtml += `<br><div class="card">
+            <div class="card-body">
+              <h4><strong>${presc.prescription_name}</strong></h4>
+              <p>${presc.prescription_description}</p>
+            </div>
+          </div>`;
+    });
+    document.getElementById("prescriptions").innerHTML = phtml;
+    let id = account.id;
   } catch (error) {
     alert(error.message);
   }
